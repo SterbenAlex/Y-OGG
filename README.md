@@ -14,10 +14,10 @@ Windows 10/11: double-click `Y-OGG.exe` (CustomTkinter GUI) or run the CLI. Enco
 
 | Вкладка | Что делает |
 |---------|------------|
-| **Через ссылку** | Вставь URL, скачай аудио как **MP3** через yt-dlp + ffmpeg |
+| **Через ссылку** | Вставь URL, скачай аудио как **MP3** (yt-dlp для YouTube/SoundCloud/видео VK; API VK для аудио) |
 | **Конвертировать скачанное** | Локальные MP3 → mono OGG (тот же энкодер `convert_file(..., mode="new")`) |
 
-Поддерживаемые сайты для ссылок: **YouTube**, **SoundCloud**, **VK (ВКонтакте)**. Другие хосты всё равно пробуются через yt-dlp.
+Поддерживаемые сайты для ссылок: **YouTube**, **SoundCloud**, **VK (ВКонтакте)**. YouTube / SoundCloud / *видео* VK — через yt-dlp. Ссылки на *аудио* VK (`vk.ru/audioOWNER_ID_TRACK_ID`, `vk.com/audio…`) качаются через API VK, не через yt-dlp. Другие хосты всё равно пробуются через yt-dlp.
 
 - Кнопка **Вставить** и **Ctrl+V** работают и на русской раскладке (keycode 86).
 - MP3 сохраняются в выбранную папку (по умолчанию `Downloads` рядом с программой, иначе `%USERPROFILE%\Downloads\Y-OGG`).
@@ -37,11 +37,12 @@ Y-OGG\
   bin\ffprobe.exe
 ```
 
-Программа передаёт его в yt-dlp как `--cookies`. **Браузерные cookies сама не забирает.**
+Программа передаёт его в yt-dlp как `--cookies` (YouTube / SoundCloud / видео VK). Для **аудио VK** тот же файл читается самой программой (заголовок Cookie). **Браузерные cookies сама не забирает.** Значения cookies никогда не пишутся в лог и не коммитятся.
 
 - **YouTube**: при 403 пробуются `player_client` web → ios → android, плюс `--force-ipv4`. Cookies помогают, если Google режет анонимные запросы.
 - **SoundCloud**: тот же пайплайн yt-dlp.
-- **VK / vk.com / vk.ru / vkvideo**: часто нужна авторизация. Если yt-dlp просит логин — положи `cookies.txt` (Netscape) рядом с программой. Без него приватные и многие обычные треки VK не скачаются.
+- **VK audio** (`vk.com/audio…`, `vk.ru/audioOWNER_ID_TRACK_ID[_hash]`): **нужен cookies.txt**. yt-dlp здесь не используется — у него только видео-экстракторы VK, ссылка `/audio619_…` падает как `Unsupported URL`. Y-OGG делает POST на `al_audio.php` (`act=reload_audios` / `reload_audio`) с сессией из cookies и пишет MP3 через ffmpeg. Без файла или с мёртвой сессией будет ошибка на русском, без дампа секретов.
+- **VK video** (`vk.com/video…`, vkvideo): по-прежнему yt-dlp + cookies.
 
 ---
 
@@ -144,7 +145,7 @@ The frozen exe finds `bin\` via `Path(sys.executable).parent / "bin"` (`yogg_roo
 
 - `y_ogg.py` / `yogg.cmd` — CLI converter (no args → GUI)
 - `yogg_gui.py` — CustomTkinter GUI (две вкладки; конвертер вызывает `convert_file(..., mode="new")`)
-- `yogg_download.py` — yt-dlp MP3 downloader (YouTube / SoundCloud / VK)
+- `yogg_download.py` — MP3 downloader (yt-dlp for YouTube / SoundCloud / VK video; native API for VK audio)
 - `Y-OGG.spec` — PyInstaller onedir spec
 - `bench.py` — batch + report
 - `bench/report.md`, `bench/results.csv` — last bench (committed)
@@ -159,6 +160,6 @@ Do **not** commit `ffmpeg.exe`, `yt-dlp`, `Y-OGG.exe`, encoded OGGs, `cookies.tx
 
 Конвертер MP3 в моно OGG Vorbis с жёстким лимитом 1.5 МиБ. Новый энкодер не набивает файл до потолка: берёт битрейт из длительности с запасом, держит 32/44.1 кГц на коротких треках и опускает частоту / q / CBR только когда иначе не влезть. Даунмикс — равная мощность каналов, плюс cutoff сверху. Отрицательный q в ffmpeg не передаётся.
 
-Две вкладки: **Через ссылку** качает MP3 с YouTube / SoundCloud / VK (yt-dlp + ffmpeg); **Конвертировать скачанное** — прежний локальный энкодер. Для VK почти всегда нужен `cookies.txt` (Netscape) рядом с программой.
+Две вкладки: **Через ссылку** качает MP3 с YouTube / SoundCloud (yt-dlp + ffmpeg) и аудио VK по ссылкам `vk.ru/audioOWNER_ID_TRACK_ID` (API VK + cookies.txt; yt-dlp только для *видео* VK); **Конвертировать скачанное** — прежний локальный энкодер.
 
 Готовый продукт — папка с `Y-OGG.exe`: двойной щелчок, выбор ссылки или MP3, результат в `Downloads` / `Finished`.

@@ -155,17 +155,45 @@ def _bin_dirs() -> list[Path]:
     return uniq
 
 
+_YTDLP_OK: dict[str, bool] = {}
+
+
+def _ytdlp_runs(path: Path) -> bool:
+    """True when yt-dlp --version succeeds (skip broken PyInstaller builds)."""
+    key = str(path).lower()
+    cached = _YTDLP_OK.get(key)
+    if cached is not None:
+        return cached
+    ok = False
+    try:
+        proc = run_cmd([str(path), "--version"], timeout=20)
+        blob = (_decode(proc.stdout) + _decode(proc.stderr)).strip()
+        ok = proc.returncode == 0 and bool(re.search(r"\d{4}\.\d{2}", blob))
+    except Exception:
+        ok = False
+    _YTDLP_OK[key] = ok
+    return ok
+
+
 def find_exe(name: str) -> Path | None:
     names = [name]
     if os.name == "nt" and not name.lower().endswith(".exe"):
         names.insert(0, name + ".exe")
+    want_ytdlp = "yt-dlp" in name.lower()
     for folder in _bin_dirs():
         for n in names:
             p = folder / n
             if p.is_file():
+                if want_ytdlp and not _ytdlp_runs(p):
+                    continue
                 return p
     which = shutil.which(name) or (shutil.which(name + ".exe") if os.name == "nt" else None)
-    return Path(which) if which else None
+    if which:
+        p = Path(which)
+        if want_ytdlp and not _ytdlp_runs(p):
+            return None
+        return p
+    return None
 
 
 def require_tools() -> dict[str, Path]:

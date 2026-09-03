@@ -39,6 +39,7 @@ from yogg_download import (
     detect_host,
     download_audio_mp3,
     host_label,
+    is_vk_audio_url,
     looks_like_url,
     normalize_url,
     playlist_choice_needed,
@@ -215,7 +216,7 @@ class YOggApp(ctk.CTk):
 
         ctk.CTkLabel(
             wrap,
-            text=f"YouTube, SoundCloud и VK. Другие сайты — тоже через yt-dlp.",
+            text="YouTube и SoundCloud — yt-dlp. Аудио VK (vk.ru/audio…) — API VK + cookies.txt; видео VK — yt-dlp.",
             font=ctk.CTkFont(size=12),
             text_color=COLOR_HINT,
             anchor="w",
@@ -830,7 +831,8 @@ class YOggApp(ctk.CTk):
             messagebox.showerror(APP_NAME, f"Не удалось создать папку:\n{exc}", parent=self)
             return
         try:
-            require_ytdlp()
+            if not is_vk_audio_url(url):
+                require_ytdlp()
             require_tools()
         except YoggError as exc:
             messagebox.showerror(APP_NAME, exc.full(), parent=self)
@@ -854,7 +856,9 @@ class YOggApp(ctk.CTk):
 
         self._set_busy(True, "download")
         self.dl_progress.set(0)
-        self.dl_status_var.set("Запускаю yt-dlp…")
+        self.dl_status_var.set(
+            "Запускаю скачивание VK…" if is_vk_audio_url(url) else "Запускаю yt-dlp…"
+        )
         threading.Thread(
             target=self._download_worker,
             args=(url, folder, playlist_mode, auto, ogg_folder),

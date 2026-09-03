@@ -5,6 +5,7 @@ bin/*.exe
 bin/yt-dlp*
 bin/ffmpeg*
 bin/ffprobe*
+bin/_internal/
 Y-OGG.exe
 __pycache__/
 *.py[cod]
