@@ -1,0 +1,27 @@
+# Outputs / binaries (never commit ffmpeg, yt-dlp, the GUI exe, or encoded OGGs)
+Finished/
+bin/*.exe
+bin/yt-dlp*
+bin/ffmpeg*
+bin/ffprobe*
+Y-OGG.exe
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.env
+*.egg-info/
+
+# Local calibration and bench encodes
+_calib/
+bench/out/
+*.ogg
+
+# Keep markdown/csv reports
+!bench/*.md
+!bench/*.csv
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,37 @@
+mode,filename,duration_s,src_bytes,out_bytes,out_kbps,sample_rate,enc_mode,q,cbr_kbps,cutoff_hz,encodes,bpm_est,genre,under_1_5mb,ebur128,notes
+baseline,angelhard - HARD MOVEMENT (Slowed).mp3,104.312,4604847,355777,27.29,16000,q=0.0,0.0,,0,1,152.0,hardcore/gabber,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Bountyhunter - Woops (Original Remastered Mix).mp3,256.862,10279749,875043,27.25,16000,q=0.0,0.0,,0,1,152.0,hardcore/gabber,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Carpenter Brut - Disco Zombi Italia.mp3,317.441,13698502,1071348,27.0,16000,q=0.0,0.0,,0,1,123.0,synthwave,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Dazegxd - 4ever (no data).mp3,251.481,5852302,748129,23.8,16000,q=0.0,0.0,,0,1,83.4,breaks/dnb,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,DJ Rob - Boys Interface (Dark Headz Remix).mp3,179.294,7316655,609917,27.21,16000,q=0.0,0.0,,0,1,161.5,hardcore/gabber,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,DJ UNIVXRSEL - DROLLXD.mp3,137.109,5213932,480459,28.03,16000,q=0.0,0.0,,0,1,117.5,hardcore/gabber,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Kairi The Maid - Crystal of Faded Chilhoods.mp3,360.014,7874589,1152260,25.6,16000,q=0.0,0.0,,0,1,92.3,electronic/ambient,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,LiterallyMe - Hard Parade.mp3,162.913,6615457,555504,27.28,16000,q=0.0,0.0,,0,1,89.1,hardcore/gabber,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Lone - Airglow Fires.mp3,360.002,7151398,1133734,25.19,16000,q=0.0,0.0,,0,1,117.5,electronic/ambient,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,"LONOWN, riserayss - worry (ultra slowed).mp3",255.64,5738866,829448,25.96,16000,q=0.0,0.0,,0,1,92.3,electronic/slowed,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Mick Gordon - Type-03.mp3,322.929,7010593,1133578,28.08,16000,q=0.0,0.0,,0,1,89.1,industrial/metal,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Revolution SS13 Fan-Track.mp3,389.688,6239616,1253955,25.74,16000,q=0.0,0.0,,0,1,99.4,electronic/game,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,You'll Be UNDER MY WHEELS.mp3,236.973,7515869,806095,27.21,16000,q=0.0,0.0,,0,1,152.0,industrial/rock,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Бутусов - Тема Дороги (OST Жмурки).mp3,329.038,13168028,1035812,25.18,16000,q=0.0,0.0,,0,1,107.7,soundtrack,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Зверев Сергей - Dolce Gabbana.mp3,187.977,7911866,629748,26.8,16000,q=0.0,0.0,,0,1,123.0,pop/rap,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Любэ - Возле твой любви (OST Князь Владимир).mp3,214.38,8665779,712487,26.59,16000,q=0.0,0.0,,0,1,99.4,soundtrack,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Русская Рать - Ой что то мы засиделись братцы.mp3,267.847,10715472,873290,26.08,16000,q=0.0,0.0,,0,1,92.3,folk/rock,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+baseline,Серега Пират - Вайбмен.mp3,187.717,8030081,617008,26.3,16000,q=0.0,0.0,,0,1,112.3,rap,True,,baseline: -ac 1 -ar 16000 -c:a libvorbis -q:a 0; baseline 16k q=0
+new,angelhard - HARD MOVEMENT (Slowed).mp3,104.312,4604847,913793,70.08,44100,q=2.0,2.0,,16000,1,152.0,hardcore/gabber,True,I=-11.2 LUFS LRA=7.0 LU,target 64.0 kbps (budget 102.5); I=-11.2 LUFS LRA=7.0 LU
+new,Bountyhunter - Woops (Original Remastered Mix).mp3,256.862,10279749,1005334,31.31,22050,q=0.5,0.5,,9800,1,152.0,hardcore/gabber,True,I=-12.0 LUFS LRA=8.0 LU,target 41.6 kbps (budget 41.6); I=-12.0 LUFS LRA=8.0 LU
+new,Carpenter Brut - Disco Zombi Italia.mp3,317.441,13698502,1063418,26.8,16000,q=0.0,0.0,,7200,1,123.0,synthwave,True,I=-9.3 LUFS LRA=6.6 LU,target 33.7 kbps (budget 33.7); I=-9.3 LUFS LRA=6.6 LU
+new,Dazegxd - 4ever (no data).mp3,251.481,5852302,932419,29.66,22050,q=0.5,0.5,,9800,1,83.4,breaks/dnb,True,I=-12.0 LUFS LRA=13.1 LU,target 42.5 kbps (budget 42.5); I=-12.0 LUFS LRA=13.1 LU
+new,DJ Rob - Boys Interface (Dark Headz Remix).mp3,179.294,7316655,853853,38.1,22050,q=2.0,2.0,,9800,1,161.5,hardcore/gabber,True,I=-10.4 LUFS LRA=11.2 LU,target 59.7 kbps (budget 59.7); drop to 22050; I=-10.4 LUFS LRA=11.2 LU
+new,DJ UNIVXRSEL - DROLLXD.mp3,137.109,5213932,1021029,59.57,32000,q=2.0,2.0,,14000,1,117.5,hardcore/gabber,True,I=-4.4 LUFS LRA=1.1 LU,target 64.0 kbps (budget 78.0); I=-4.4 LUFS LRA=1.1 LU
+new,Kairi The Maid - Crystal of Faded Chilhoods.mp3,360.014,7874589,1101886,24.49,16000,cbr28k,,28,7200,1,92.3,electronic/ambient,True,I=-10.7 LUFS LRA=5.8 LU,target 29.7 kbps (budget 29.7); cbr; I=-10.7 LUFS LRA=5.8 LU
+new,LiterallyMe - Hard Parade.mp3,162.913,6615457,812855,39.92,22050,q=2.0,2.0,,9800,1,89.1,hardcore/gabber,True,I=-10.0 LUFS LRA=9.9 LU,target 64.0 kbps (budget 65.7); drop to 22050; I=-10.0 LUFS LRA=9.9 LU
+new,Lone - Airglow Fires.mp3,360.002,7151398,1121913,24.93,16000,cbr28k,,28,7200,1,117.5,electronic/ambient,True,I=-15.3 LUFS LRA=7.5 LU,target 29.7 kbps (budget 29.7); cbr; I=-15.3 LUFS LRA=7.5 LU
+new,"LONOWN, riserayss - worry (ultra slowed).mp3",255.64,5738866,941357,29.46,22050,q=0.5,0.5,,9800,1,92.3,electronic/slowed,True,I=-10.6 LUFS LRA=9.1 LU,target 41.8 kbps (budget 41.8); I=-10.6 LUFS LRA=9.1 LU
+new,Mick Gordon - Type-03.mp3,322.929,7010593,1129608,27.98,16000,q=0.0,0.0,,7200,1,89.1,industrial/metal,True,I=-10.5 LUFS LRA=12.7 LU,target 33.1 kbps (budget 33.1); I=-10.5 LUFS LRA=12.7 LU
+new,Revolution SS13 Fan-Track.mp3,389.688,6239616,1303775,26.77,16000,cbr26k,,26,7200,1,99.4,electronic/game,True,I=-14.2 LUFS LRA=7.1 LU,target 27.4 kbps (budget 27.4); cbr; I=-14.2 LUFS LRA=7.1 LU
+new,You'll Be UNDER MY WHEELS.mp3,236.973,7515869,943849,31.86,22050,q=0.5,0.5,,9800,1,152.0,industrial/rock,True,I=-11.2 LUFS LRA=2.8 LU,target 45.1 kbps (budget 45.1); I=-11.2 LUFS LRA=2.8 LU
+new,Бутусов - Тема Дороги (OST Жмурки).mp3,329.038,13168028,1032028,25.09,16000,q=0.0,0.0,,7200,1,107.7,soundtrack,True,I=-14.1 LUFS LRA=6.1 LU,target 32.5 kbps (budget 32.5); I=-14.1 LUFS LRA=6.1 LU
+new,Зверев Сергей - Dolce Gabbana.mp3,187.977,7911866,792653,33.73,22050,q=1.0,1.0,,9800,1,123.0,pop/rap,True,I=-14.5 LUFS LRA=5.6 LU,target 56.9 kbps (budget 56.9); drop to 22050; I=-14.5 LUFS LRA=5.6 LU
+new,Любэ - Возле твой любви (OST Князь Владимир).mp3,214.38,8665779,897426,33.49,22050,q=1.0,1.0,,9800,1,99.4,soundtrack,True,I=-12.8 LUFS LRA=9.1 LU,target 49.9 kbps (budget 49.9); drop to 22050; I=-12.8 LUFS LRA=9.1 LU
+new,Русская Рать - Ой что то мы засиделись братцы.mp3,267.847,10715472,837128,25.0,16000,q=0.5,0.5,,7200,1,92.3,folk/rock,True,I=-13.5 LUFS LRA=2.4 LU,target 39.9 kbps (budget 39.9); drop to 16000; I=-13.5 LUFS LRA=2.4 LU
+new,Серега Пират - Вайбмен.mp3,187.717,8030081,805599,34.33,22050,q=1.0,1.0,,9800,1,112.3,rap,True,I=-14.2 LUFS LRA=4.1 LU,target 57.0 kbps (budget 57.0); drop to 22050; I=-14.2 LUFS LRA=4.1 LU
