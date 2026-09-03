@@ -21,6 +21,10 @@ bench/out/
 !bench/*.md
 !bench/*.csv
 
+# PyInstaller
+build/
+dist/
+
 # OS junk
 Thumbs.db
 Desktop.ini

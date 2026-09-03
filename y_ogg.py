@@ -4,8 +4,9 @@
 
 Author: de1ze1 (Vadim Ugarov / Вадим Угаров). Free to use.
 
-This pass is a CLI converter (no YouTube / GUI). Encoder is libvorbis
-in OGG — never Opus.
+CLI (`python y_ogg.py file.mp3`) and CustomTkinter GUI (no args / --gui).
+Encoder is libvorbis in OGG — never Opus. GUI always calls convert_file
+with mode="new" (adaptive rate/q, q never negative).
 
 Strategy
 --------
@@ -35,7 +36,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 APP_NAME = "Y-OGG"
-APP_VERSION = "2.0.0"
+APP_VERSION = "1.2.0"
 AUTHOR = "de1ze1 (Вадим Угаров)"
 
 # Hard cap: 1.5 MiB exactly.
@@ -109,6 +110,21 @@ def _script_dir() -> Path:
     return Path(__file__).resolve().parent
 
 
+def yogg_root() -> Path:
+    """Folder that contains the app (and bin/, Finished/).
+
+    Frozen: directory of Y-OGG.exe so the product is portable.
+    Env Y-OGG / Y_OGG is still searched for ffmpeg in _bin_dirs().
+    """
+    return _script_dir()
+
+
+def default_finished_dir() -> Path:
+    d = yogg_root() / "Finished"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
 def _bin_dirs() -> list[Path]:
     out: list[Path] = []
     for key in ("Y-OGG", "Y_OGG"):
@@ -116,11 +132,13 @@ def _bin_dirs() -> list[Path]:
         if env:
             out.append(Path(env) / "bin")
             out.append(Path(env))
-    here = _script_dir()
+    here = yogg_root()
     out.extend(
         [
             here / "bin",
             here,
+            _script_dir() / "bin",
+            _script_dir(),
             Path.home() / "Desktop" / "Y-OGG" / "bin",
             Path.home() / "ffmpeg" / "bin",
             Path.home() / "ffmpeg",
@@ -795,7 +813,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         prog="yogg",
         description=(
             "Convert MP3 (or a folder) to mono OGG Vorbis, hard-capped at "
-            f"{LIMIT_BYTES} bytes (1.5 MiB). Author: {AUTHOR}."
+            f"{LIMIT_BYTES} bytes (1.5 MiB). No args opens the GUI. "
+            f"Author: {AUTHOR}."
         ),
     )
     p.add_argument("input", help="Audio file or folder")
@@ -815,7 +834,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
-def main(argv: list[str] | None = None) -> int:
+def cli_main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     src = Path(args.input)
     try:
@@ -876,6 +895,37 @@ def main(argv: list[str] | None = None) -> int:
     except YoggError as exc:
         print(exc.full(), file=sys.stderr)
         return 1
+
+
+def _wants_gui(argv: list[str]) -> bool:
+    if "--cli" in argv:
+        return False
+    if not argv:
+        return True
+    if argv[0] in ("--gui", "-g"):
+        return True
+    return "--gui" in argv and not any(
+        a for a in argv if a not in ("--gui", "-g") and not a.startswith("-")
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    if _wants_gui(argv):
+        try:
+            from yogg_gui import run_gui
+        except ImportError:
+            print(
+                "GUI requires customtkinter.\n"
+                "Install: py -3.12 -m pip install customtkinter\n"
+                "CLI:     py -3.12 y_ogg.py file.mp3",
+                file=sys.stderr,
+            )
+            return 1
+        return int(run_gui() or 0)
+    argv = [a for a in argv if a not in ("--cli", "--gui", "-g")]
+    return cli_main(argv)
 
 
 if __name__ == "__main__":
