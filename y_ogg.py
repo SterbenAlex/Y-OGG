@@ -36,7 +36,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 APP_NAME = "Y-OGG"
-APP_VERSION = "1.2.0"
+APP_VERSION = "1.3.0"
 AUTHOR = "de1ze1 (Вадим Угаров)"
 
 # Hard cap: 1.5 MiB exactly.

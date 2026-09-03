@@ -1,5 +1,6 @@
 # Outputs / binaries (never commit ffmpeg, yt-dlp, the GUI exe, or encoded OGGs)
 Finished/
+Downloads/
 bin/*.exe
 bin/yt-dlp*
 bin/ffmpeg*
@@ -11,6 +12,7 @@ venv/
 .venv/
 .env
 *.egg-info/
+cookies.txt
 
 # Local calibration and bench encodes
 _calib/
