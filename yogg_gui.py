@@ -45,6 +45,7 @@ from yogg_download import (
     playlist_choice_needed,
     require_ytdlp,
 )
+import yogg_update as upd
 
 COLOR_BG = "#121214"
 COLOR_SURFACE = "#1C1C22"
@@ -121,6 +122,11 @@ class YOggApp(ctk.CTk):
         self.url_var.trace_add("write", self._on_url_written)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
+        # Updates (app + yt-dlp), never block the UI.
+        self.settings = upd.load_settings()
+        self._ytdlp_updating = False
+        self.after(1500, self._startup_updates)
+
     def _apply_icon(self) -> None:
         icon = _icon_path()
         if icon is None:
@@ -169,6 +175,26 @@ class YOggApp(ctk.CTk):
 
         self.url_panel.pack(fill="both", expand=True)
         self._paint_tabs()
+
+        upd_row = ctk.CTkFrame(self, fg_color="transparent")
+        upd_row.pack(side="bottom", fill="x", padx=pad_x, pady=(0, 4))
+        self.update_status_var = tk.StringVar(value="")
+        ctk.CTkButton(
+            upd_row,
+            text="Обновления ▾",
+            width=120,
+            height=26,
+            fg_color=COLOR_TAB_OFF,
+            hover_color="#3A3A44",
+            command=self._show_update_menu,
+        ).pack(side="left")
+        ctk.CTkLabel(
+            upd_row,
+            textvariable=self.update_status_var,
+            text_color=COLOR_MUTED,
+            font=ctk.CTkFont(size=12),
+            anchor="w",
+        ).pack(side="left", padx=(10, 0), fill="x", expand=True)
 
         ctk.CTkLabel(
             self,
@@ -888,8 +914,15 @@ class YOggApp(ctk.CTk):
                 progress=progress,
             )
         except YoggError as exc:
-            self.after(0, lambda e=exc: self._on_dl_fail(e.full()))
-            return
+            retry = None
+            if not is_vk_audio_url(url) and upd.looks_like_extractor_error(exc.full()):
+                retry = self._retry_after_ytdlp_update(
+                    url, folder, playlist_mode, status, progress
+                )
+            if retry is None:
+                self.after(0, lambda e=exc: self._on_dl_fail(e.full()))
+                return
+            result = retry
         except Exception:
             self.after(0, lambda t=traceback.format_exc(): self._on_dl_fail(
                 "Неожиданная ошибка.\n\n" + t[-1800:]
@@ -924,6 +957,183 @@ class YOggApp(ctk.CTk):
             0,
             lambda r=result, n=ogg_note, e=ogg_err: self._on_dl_done(r, n, e),
         )
+
+    def _retry_after_ytdlp_update(self, url, folder, playlist_mode, status, progress):
+        """Extractor error: run yt-dlp -U once and retry. None = give up."""
+        if getattr(self, "_ytdlp_retry_done", False):
+            return None
+        self._ytdlp_retry_done = True
+        try:
+            exe = require_ytdlp()
+        except YoggError:
+            return None
+        status("Ошибка извлечения — обновляю yt-dlp и пробую снова…")
+        ok, old, new, _log = upd.update_ytdlp(exe)
+        self._mark_ytdlp_updated(ok)
+        self.after(0, lambda: self.update_status_var.set(
+            f"yt-dlp: {old} → {new}" if new != old else f"yt-dlp {new}"
+        ))
+        if new == old:
+            return None
+        try:
+            return download_audio_mp3(
+                url, folder, playlist_mode=playlist_mode, status=status, progress=progress
+            )
+        except Exception:
+            return None
+
+    # ----- updates -----
+
+    def _set_upd_status(self, text: str) -> None:
+        try:
+            self.after(0, lambda t=text: self.update_status_var.set(t))
+        except Exception:
+            pass
+
+    def _show_update_menu(self) -> None:
+        menu = tk.Menu(self, tearoff=0)
+        menu.add_command(label="Проверить обновления", command=lambda: self._check_app_update(manual=True))
+        menu.add_command(label="Обновить yt-dlp", command=lambda: self._update_ytdlp_bg(manual=True))
+        self._chk_var = tk.BooleanVar(value=bool(self.settings.get("check_updates_on_start", True)))
+        menu.add_checkbutton(
+            label="Проверять обновления при запуске",
+            variable=self._chk_var,
+            command=self._toggle_startup_check,
+        )
+        self._ytauto_var = tk.BooleanVar(value=bool(self.settings.get("auto_update_ytdlp", True)))
+        menu.add_checkbutton(
+            label=f"Автообновление yt-dlp (раз в {upd.YTDLP_MAX_AGE_DAYS} дн.)",
+            variable=self._ytauto_var,
+            command=self._toggle_ytdlp_auto,
+        )
+        menu.add_separator()
+        menu.add_command(label=f"Версия {APP_NAME} {upd.current_version()}", state="disabled")
+        try:
+            menu.tk_popup(self.winfo_pointerx(), self.winfo_pointery())
+        finally:
+            menu.grab_release()
+
+    def _toggle_startup_check(self) -> None:
+        self.settings["check_updates_on_start"] = bool(self._chk_var.get())
+        upd.save_settings(self.settings)
+
+    def _toggle_ytdlp_auto(self) -> None:
+        self.settings["auto_update_ytdlp"] = bool(self._ytauto_var.get())
+        upd.save_settings(self.settings)
+
+    def _mark_ytdlp_updated(self, ok: bool) -> None:
+        if ok:
+            self.settings["ytdlp_last_update"] = __import__("time").time()
+            upd.save_settings(self.settings)
+
+    def _startup_updates(self) -> None:
+        if self.settings.get("check_updates_on_start", True):
+            self._check_app_update(manual=False)
+        if self.settings.get("auto_update_ytdlp", True):
+            self._update_ytdlp_bg(manual=False)
+
+    def _check_app_update(self, manual: bool) -> None:
+        if manual:
+            self.update_status_var.set("Проверяю обновления…")
+
+        def work() -> None:
+            try:
+                rel = upd.check_for_update(timeout=6.0 if not manual else 15.0)
+            except Exception as exc:
+                if manual:
+                    self._set_upd_status("Не удалось проверить обновления (нет сети?)")
+                    self.after(0, lambda e=exc: messagebox.showwarning(
+                        APP_NAME, f"Не удалось проверить обновления:\n{e}", parent=self))
+                return
+            if rel is None:
+                if manual:
+                    self._set_upd_status(f"Установлена последняя версия {upd.current_version()}")
+                    self.after(0, lambda: messagebox.showinfo(
+                        APP_NAME, f"У вас последняя версия ({upd.current_version()}).", parent=self))
+                return
+            self._set_upd_status(f"Доступна версия {rel.version}")
+            self.after(0, lambda r=rel: self._offer_app_update(r))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _offer_app_update(self, rel) -> None:
+        if not messagebox.askyesno(
+            APP_NAME, f"Доступна версия {rel.version}. Обновить?", parent=self
+        ):
+            return
+        if not upd.is_frozen():
+            messagebox.showinfo(
+                APP_NAME,
+                "Автообновление работает только в собранной версии (Y-OGG.exe).\n"
+                f"Скачайте релиз вручную:\n{rel.url}\n\nИли: git pull",
+                parent=self,
+            )
+            return
+        if self._busy:
+            messagebox.showwarning(APP_NAME, "Дождитесь окончания текущей операции.", parent=self)
+            return
+        self._busy = True
+        self.update_status_var.set(f"Скачиваю {rel.version}…")
+
+        def work() -> None:
+            try:
+                script = upd.prepare_app_update(
+                    rel, progress=lambda v: self._set_upd_status(f"Скачиваю {rel.version}: {v*100:.0f}%")
+                )
+            except Exception as exc:
+                def fail(e=exc) -> None:
+                    self._busy = False
+                    self.update_status_var.set("Обновление не удалось")
+                    messagebox.showerror(APP_NAME, f"Не удалось скачать обновление:\n{e}", parent=self)
+                self.after(0, fail)
+                return
+            self.after(0, lambda s=script: self._apply_and_exit(s))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _apply_and_exit(self, script: Path) -> None:
+        try:
+            upd.launch_updater(script)
+        except Exception as exc:
+            self._busy = False
+            messagebox.showerror(APP_NAME, f"Не удалось запустить обновление:\n{exc}", parent=self)
+            return
+        self.update_status_var.set("Устанавливаю обновление, программа перезапустится…")
+        self.after(300, self.destroy)
+
+    def _update_ytdlp_bg(self, manual: bool) -> None:
+        if self._ytdlp_updating:
+            return
+        try:
+            exe = require_ytdlp()
+        except YoggError as exc:
+            if manual:
+                messagebox.showerror(APP_NAME, exc.full(), parent=self)
+            return
+        self._ytdlp_updating = True
+
+        def work() -> None:
+            try:
+                if not manual and not upd.ytdlp_needs_update(exe, self.settings):
+                    return
+                self._set_upd_status("Обновляю yt-dlp…")
+                ok, old, new, log = upd.update_ytdlp(exe)
+                self.after(0, lambda o=ok: self._mark_ytdlp_updated(o))
+                if ok and new != old:
+                    msg = f"yt-dlp обновлён: {old} → {new}"
+                elif ok:
+                    msg = f"yt-dlp {new} — последняя версия"
+                else:
+                    msg = "Не удалось обновить yt-dlp" + ("" if manual else " (нет сети?)")
+                self._set_upd_status(msg)
+                if manual:
+                    self.after(0, lambda m=msg, l=log, o=ok: (
+                        messagebox.showinfo if o else messagebox.showwarning
+                    )(APP_NAME, m + ("" if o else "\n\n" + l[-800:]), parent=self))
+            finally:
+                self._ytdlp_updating = False
+
+        threading.Thread(target=work, daemon=True).start()
 
     def _on_dl_done(self, result, ogg_note: str, ogg_err: str) -> None:
         self._stop_busy()

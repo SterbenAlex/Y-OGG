@@ -17,7 +17,7 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = []
 binaries = []
-hiddenimports = ["customtkinter", "yogg_gui", "yogg_download"]
+hiddenimports = ["customtkinter", "yogg_gui", "yogg_download", "yogg_update"]
 
 tmp_ret = collect_all("customtkinter")
 datas += tmp_ret[0]
