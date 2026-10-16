@@ -167,7 +167,17 @@ def extract_release(zip_path: Path) -> Path:
     """Extract and return the folder that contains Y-OGG.exe."""
     out = zip_path.parent / "extracted"
     with zipfile.ZipFile(zip_path) as zf:
-        zf.extractall(out)
+        for info in zf.infolist():
+            if not info.flag_bits & 0x800:
+                # tar.exe -a writes OEM (cp866) names without the UTF-8 flag.
+                raw = info.filename.encode("cp437", errors="replace")
+                for enc in ("utf-8", "cp866"):
+                    try:
+                        info.filename = raw.decode(enc)
+                        break
+                    except UnicodeDecodeError:
+                        continue
+            zf.extract(info, out)
     for exe in sorted(out.rglob("Y-OGG.exe"), key=lambda p: len(p.parts)):
         return exe.parent
     raise RuntimeError("В архиве обновления не найден Y-OGG.exe")
